@@ -16,5 +16,5 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "foodtasker.settings")
 application = get_wsgi_application()
 
 # User whitenoise package to serve static fiels on Heroku
-from whitenoise.django import DjangoWiteNoise
-application = DjangoWiteNoise(application)
+from whitenoise.django import DjangoWhiteNoise
+application = DjangoWhiteNoise(application)
