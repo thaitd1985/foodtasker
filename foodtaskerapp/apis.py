@@ -57,11 +57,11 @@ def customer_add_order(request):
         stripe_token = request.POST["stripe_token"]
         ## Check whether customer has any order that is not Delivered
         if Order.objects.filter(customer = customer).exclude(status = Order.DELIVERED):
-            return JsonResponse({"status": "fail", "error": "Your last order must be completed."})
+            return JsonResponse({"status": "failed", "error": "Your last order must be completed."})
 
         # Check address
         if not request.POST["address"]:
-            return JsonResponse({"status": "fail", "error": "Address is required"})
+            return JsonResponse({"status": "failed", "error": "Address is required"})
 
         # Get Order Details
         order_details = json.loads(request.POST["order_details"])
@@ -162,7 +162,7 @@ def driver_pick_order(request):
 
         # Check if driver can only pick up one order at the same time
         if Order.objects.filter(driver = driver).exclude(status = Order.ONTHEWAY):
-            return JsonResponse({"status": "fail", "error": "You can only pick one order at the same time"})
+            return JsonResponse({"status": "failed", "error": "You can only pick one order at the same time"})
 
         try:
             order = Order.objects.get(
@@ -177,7 +177,7 @@ def driver_pick_order(request):
 
             return JsonResponse({"status": "success"})
         except Order.DoesNotExist:
-            return JsonResponse({"status": "fail", "error": "This order is picked up from the other"})
+            return JsonResponse({"status": "failed", "error": "This order is picked up from the other"})
     return JsonResponse({})
 
 # GET params : access_token
