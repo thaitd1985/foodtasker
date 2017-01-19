@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'bootstrap3',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -125,13 +126,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'
+#STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_REDIRECT_URL = '/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
 
 import dj_database_url
 db_from_env = dj_database_url.config()
@@ -167,3 +168,24 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 STRIPE_API_KEY = 'sk_test_wpawxcch5prScRa8GZf3iYNT'
+
+# http://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+
+AWS_STORAGE_BUCKET_NAME = 'foodtingting'
+AWS_ACCESS_KEY_ID = 'AKIAIZM3EUN2OBIONX7A'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+STATICFILES_LOCATION = 'static'
+STATICFILES_STORAGE = 'foodtaskerapp.custom_storages.StaticStorage'
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+
+MEDIAFILES_LOCATION = 'media'
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+DEFAULT_FILE_STORAGE = 'foodtaskerapp.custom_storages.MediaStorage'
+
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# By default files with the same name will overwrite each other. Set this to False to have extra characters appended.
+AWS_S3_FILE_OVERWRITE = False
