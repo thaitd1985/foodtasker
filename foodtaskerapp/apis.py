@@ -7,7 +7,9 @@ from django.utils import timezone
 
 from foodtaskerapp.models import Restaurant, Meal, Order, OrderDetails, Driver
 from foodtaskerapp.serializers import RestaurantSerializer, \
-    MealSerializer, OrderSerializer
+    MealSerializer, OrderSerializer, RestaurantSearchSerializer
+
+from haystack.query import SearchQuerySet
 
 import stripe
 from foodtasker.settings import STRIPE_API_KEY
@@ -161,7 +163,7 @@ def driver_pick_order(request):
         driver = access_token.user.driver
 
         # Check if driver can only pick up one order at the same time
-        if Order.objects.filter(driver = driver).exclude(status = Order.ONTHEWAY):
+        if Order.objects.filter(driver = driver).exclude(status = Order.DELIVERED):
             return JsonResponse({"status": "failed", "error": "You can only pick one order at the same time"})
 
         try:
@@ -242,3 +244,15 @@ def driver_update_location(request):
     driver.location = request.POST["location"]
     driver.save()
     return JsonResponse({"status": "success"})
+
+def search_restaurants(request):
+    text = request.GET["q"]
+    results = SearchQuerySet().filter(content=text)
+    for result in results:
+        print(result.name)
+    restaurants = RestaurantSearchSerializer(
+        results,
+        many = True,
+        context = {"request": request}
+    ).data
+    return JsonResponse({"restaurants": restaurants})

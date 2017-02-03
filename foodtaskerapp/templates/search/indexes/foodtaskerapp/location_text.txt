@@ -1,0 +1,3 @@
+{{ object.city }}
+{{ object.zip_code }}
+{{ object.address }}

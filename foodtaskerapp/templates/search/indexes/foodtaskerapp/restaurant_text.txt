@@ -1,0 +1,4 @@
+{{ object.logo }}
+{{ object.name }}
+{{ object.address }}
+{{ object.phone }}

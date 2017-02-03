@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from haystack.utils.geo import Point
 
 # Create your models here.
 class Restaurant(models.Model):
@@ -28,7 +29,7 @@ class Driver(models.Model):
     phone = models.CharField(max_length=500, blank=True)
     address = models.CharField(max_length=500, blank=True)
     location = models.CharField(max_length=500, blank=True)
-    
+
     def __str__(self):
         return self.user.get_full_name()
 
@@ -75,3 +76,19 @@ class OrderDetails(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class Location(models.Model):
+    latitude = models.FloatField()
+    longtitude = models.FloatField()
+    address = models.CharField(max_length = 100)
+    city = models.CharField(max_length = 30)
+    zip_code = models.CharField(max_length = 10)
+
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.address
+    # @property
+    # def coordinates(self):
+    #     return Point(self.longtitude, self.latitude)

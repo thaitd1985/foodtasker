@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
     'bootstrap3',
     'storages',
+    'haystack',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -189,3 +191,14 @@ DEFAULT_FILE_STORAGE = 'foodtaskerapp.custom_storages.MediaStorage'
 #DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # By default files with the same name will overwrite each other. Set this to False to have extra characters appended.
 AWS_S3_FILE_OVERWRITE = False
+
+# Haystack Elasticsearch config
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'restaurants',
+    },
+}
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'

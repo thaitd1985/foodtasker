@@ -5,6 +5,14 @@ from django.contrib.auth import views as auth_views
 
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework import routers
+
+from foodtaskerapp.views import LocationSearchView, AutocompleteSearchViewSet
+
+router = routers.DefaultRouter()
+router.register("location/search", LocationSearchView, base_name="location-search")
+router.register("auto/location/search", AutocompleteSearchViewSet, base_name="location-search-auto")
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -51,5 +59,11 @@ urlpatterns = [
     url(r'^api/driver/revenue/$', apis.driver_get_revenue),
     url(r'^api/driver/location/update/$', apis.driver_update_location),
 
+    # Haystack Search
+    url(r'^search/', include('haystack.urls')),
+    url(r'^api/restaurant/search/$', apis.search_restaurants),
+
+    # drf haystack search
+    url(r'^api/v1/', include(router.urls)),
 
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

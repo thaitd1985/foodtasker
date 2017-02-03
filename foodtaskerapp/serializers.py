@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from foodtaskerapp.models import Restaurant, Meal, Customer, Driver, Order, OrderDetails
+from foodtaskerapp.haystackserializers import SearchResultSetSerializerMixin
 
-class RestaurantSerializer(serializers.ModelSerializer):
+class RestaurantSerializer(serializers.ModelSerializer, SearchResultSetSerializerMixin):
     logo = serializers.SerializerMethodField()
 
     def get_logo(self, restaurant):
@@ -10,6 +11,23 @@ class RestaurantSerializer(serializers.ModelSerializer):
         log_url = restaurant.logo.url
         return request.build_absolute_uri(log_url)
 
+    class Meta:
+        model = Restaurant
+        fields = ("id", "name", "phone", "address", "logo")
+
+class RestaurantSearchSerializer(serializers.ModelSerializer, SearchResultSetSerializerMixin):
+
+    logo = serializers.SerializerMethodField()
+
+    def get_logo(self, restaurant):
+        request = self.context.get('request')
+        log_url = restaurant.logo
+        return request.build_absolute_uri(log_url)
+
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, restaurant):
+        return restaurant.pk
     class Meta:
         model = Restaurant
         fields = ("id", "name", "phone", "address", "logo")

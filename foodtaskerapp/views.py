@@ -3,8 +3,13 @@ from django.contrib.auth.decorators import login_required
 from foodtaskerapp.forms import UserForm, RestaurantForm, UserFormForUpdate, MealForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from foodtaskerapp.models import Meal, Order, Driver
+from foodtaskerapp.models import Meal, Order, Driver, Location
 from django.db.models import Sum, Count, Case, When
+
+from drf_haystack.serializers import HaystackSerializer
+from drf_haystack.viewsets import HaystackViewSet
+from .search_indexes import LocationIndex
+from drf_haystack.filters import HaystackAutocompleteFilter
 
 # Create your views here.
 def home(request):
@@ -156,3 +161,48 @@ def restaurant_sign_up(request):
         "user_form": user_form,
         "restaurant_form": restaurant_form
     })
+
+class LocationSerializer(HaystackSerializer):
+
+    class Meta:
+        # The `index_classes` attribute is a list of which search indexes
+        # we want to include in the search.
+        index_classes = [LocationIndex]
+
+        # The `fields` contains all the fields we want to include.
+        # NOTE: Make sure you don't confuse these with model attributes. These
+        # fields belong to the search index!
+        fields = [
+            "text", "address", "city", "zip_code", "autocomplete"
+        ]
+
+class LocationSearchView(HaystackViewSet):
+
+    # `index_models` is an optional list of which models you would like to include
+    # in the search result. You might have several models indexed, and this provides
+    # a way to filter out those of no interest for this particular view.
+    # (Translates to `SearchQuerySet().models(*index_models)` behind the scenes.
+    index_models = [Location]
+
+    serializer_class = LocationSerializer
+
+class AutocompleteSerializer(HaystackSerializer):
+
+    class Meta:
+        index_classes = [LocationIndex]
+        fields = ["address", "city", "zip_code", "autocomplete"]
+        ignore_fields = ["autocomplete"]
+
+        # The `field_aliases` attribute can be used in order to alias a
+        # query parameter to a field attribute. In this case a query like
+        # /search/?q=oslo would alias the `q` parameter to the `autocomplete`
+        # field on the index.
+        field_aliases = {
+            "q": "autocomplete"
+        }
+
+class AutocompleteSearchViewSet(HaystackViewSet):
+
+    index_models = [Location]
+    serializer_class = AutocompleteSerializer
+    filter_backends = [HaystackAutocompleteFilter]
